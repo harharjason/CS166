@@ -378,13 +378,6 @@ public class Ticketmaster extends FastReader {
 
 	public static void AddUser(Ticketmaster esql) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {// 1
 
-		// String email = JOptionPane.showInputDialog("Please enter your email address: ");
-		// String fname = JOptionPane.showInputDialog("Please enter your first name: ");
-		// String lname = JOptionPane.showInputDialog("Please enter your last name: ");
-		// String phone = JOptionPane.showInputDialog("Please enter your phone number: ");
-		// phone = phone.replaceAll("[^\\d]", "");
-		// String pw = JOptionPane.showInputDialog("Please enter your password: ");
-
 		FastReader input = new FastReader();
 		
 		System.out.println("Please enter your email address: ");
@@ -405,18 +398,25 @@ public class Ticketmaster extends FastReader {
 		random.nextBytes(salt);
 		KeySpec spec = new PBEKeySpec(pw.toCharArray(), salt, 65536, 256);
 		SecretKeyFactory factory = null;
+		StringBuilder pwHash = null;
 		try {
 			factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 			byte[] hash = factory.generateSecret(spec).getEncoded();
 			BigInteger bigint = new BigInteger(1,hash);
-			StringBuilder pwHash = new StringBuilder(bigint.toString(16));
+			pwHash = new StringBuilder(bigint.toString(16));
 		} catch (Exception e) {
 			throw new NoSuchAlgorithmException(e.toString());
 		}
-	}
 	
-	//sql
+		// Build and execute query
+		String query = "INSERT INTO users (email, fname, lname, phone, pwd) VALUES ('" + email + "', '" + fname + "', '"+ lname +"', '"+ phone +"', '"+ pwHash.toString() +"')";
+		try	{
+			esql.executeUpdate(query);
+		} catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
 
+	}
 	public static void AddBooking(Ticketmaster esql){//2
 		
 	}
